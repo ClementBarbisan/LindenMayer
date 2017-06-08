@@ -11,7 +11,11 @@ public class Lindenmayer : MonoBehaviour {
 	private LineRenderer line;
 	private List<Vector3> listPositions;
 	private List<Vector3> listVertices;
+	private List<Transform> bones;
+	private List<Matrix4x4> bindPoses;
+	private List<BoneWeight> weights;
 	private List<int> listTriangles;
+	private BoneWeight tmpWeight;
 	public float angle = 90;
 	private Mesh mesh;
 	// Use this for initialization
@@ -24,16 +28,45 @@ public class Lindenmayer : MonoBehaviour {
 		listPositions = new List<Vector3> ();
 		listVertices = new List<Vector3> ();
 		listTriangles = new List<int> ();
+		bones = new List<Transform> ();
+		bindPoses = new List<Matrix4x4> ();
+		weights = new List<BoneWeight> ();
 		listVertices.Add (new Vector3(-0.1f, 0.0f, 0.1f));
+		weights.Add (new BoneWeight ());
+		tmpWeight = weights [weights.Count - 1];
+		tmpWeight.boneIndex0 = 0;
+		tmpWeight.weight0 = 1;
+		weights [weights.Count - 1] = tmpWeight;
 		listVertices.Add (new Vector3(0.0f, 0.1f, -0.1f));
+		weights.Add (new BoneWeight ());
+		tmpWeight = weights [weights.Count - 1];
+		tmpWeight.boneIndex0 = 0;
+		tmpWeight.weight0 = 1;
+		weights [weights.Count - 1] = tmpWeight;
 		listVertices.Add (new Vector3(0.1f, 0.0f, -0.1f));
+		weights.Add (new BoneWeight ());
+		tmpWeight = weights [weights.Count - 1];
+		tmpWeight.boneIndex0 = 0;
+		tmpWeight.weight0 = 1;
+		weights [weights.Count - 1] = tmpWeight;
 		listVertices.Add (new Vector3(0.0f, -0.1f, 0.1f));
+		weights.Add (new BoneWeight ());
+		tmpWeight = weights [weights.Count - 1];
+		tmpWeight.boneIndex0 = 0;
+		tmpWeight.weight0 = 1;
+		weights [weights.Count - 1] = tmpWeight;
 		listTriangles.Add (0);
 		listTriangles.Add (3);
 		listTriangles.Add (2);
 		listTriangles.Add (0);
 		listTriangles.Add (2);
 		listTriangles.Add (1);
+		bones.Add (new GameObject("bone0").transform);
+		bones [bones.Count - 1].SetParent (transform);
+		bones [bones.Count - 1].transform.localRotation = transform.rotation;
+		bones [bones.Count - 1].transform.localPosition = transform.position;
+		bindPoses.Add (new Matrix4x4());
+		bindPoses [bindPoses.Count - 1] = bones [bones.Count - 1].worldToLocalMatrix * transform.localToWorldMatrix;
 		listPositions.Add (transform.position);
 		for (int i = 0; i < nameRules.Count; i++)
 		{
@@ -92,11 +125,37 @@ public class Lindenmayer : MonoBehaviour {
 			else if (current[i] == 'F')
 			{
 				int tmpCount = 0;
+				bones.Add (new GameObject("bone" + listPositions.Count).transform);
+				bones [bones.Count - 1].SetParent (transform);
+				bones [bones.Count - 1].transform.localRotation = transform.rotation;
+				bones [bones.Count - 1].transform.localPosition = transform.position;
+				bindPoses.Add (new Matrix4x4());
+				bindPoses [bindPoses.Count - 1] = bones [bones.Count - 1].worldToLocalMatrix * transform.localToWorldMatrix;
 				transform.position += transform.forward;
 				listVertices.Add (listVertices[listVertices.Count - 4] + transform.forward);
+				weights.Add (new BoneWeight ());
+				tmpWeight = weights [weights.Count - 1];
+				tmpWeight.boneIndex0 = bones.Count - 1;
+				tmpWeight.weight0 = 1;
+				weights [weights.Count - 1] = tmpWeight;
 				listVertices.Add (listVertices[listVertices.Count - 4] + transform.forward);
+				weights.Add (new BoneWeight ());
+				tmpWeight = weights [weights.Count - 1];
+				tmpWeight.boneIndex0 = bones.Count - 1;
+				tmpWeight.weight0 = 1;
+				weights [weights.Count - 1] = tmpWeight;
 				listVertices.Add (listVertices[listVertices.Count - 4] + transform.forward);
+				weights.Add (new BoneWeight ());
+				tmpWeight = weights [weights.Count - 1];
+				tmpWeight.boneIndex0 = bones.Count - 1;
+				tmpWeight.weight0 = 1;
+				weights [weights.Count - 1] = tmpWeight;
 				listVertices.Add (listVertices[listVertices.Count - 4] + transform.forward);
+				weights.Add (new BoneWeight ());
+				tmpWeight = weights [weights.Count - 1];
+				tmpWeight.boneIndex0 = bones.Count - 1;
+				tmpWeight.weight0 = 1;
+				weights [weights.Count - 1] = tmpWeight;
 				tmpCount = listVertices.Count;
 				listTriangles.Add (tmpCount - 8);
 				listTriangles.Add (tmpCount - 4);
@@ -137,6 +196,10 @@ public class Lindenmayer : MonoBehaviour {
 		mesh.triangles = listTriangles.ToArray();
 		line.numPositions = listPositions.Count;
 		line.SetPositions (listPositions.ToArray ());
+
+		mesh.bindposes = bindPoses.ToArray ();
+		mesh.boneWeights = weights.ToArray();
+		GetComponent<SkinnedMeshRenderer> ().bones = bones.ToArray ();
 	}
 
 	// Update is called once per frame
