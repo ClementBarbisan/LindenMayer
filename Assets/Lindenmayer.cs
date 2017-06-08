@@ -18,6 +18,7 @@ public class Lindenmayer : MonoBehaviour {
 	private BoneWeight tmpWeight;
 	public float angle = 90;
 	private Mesh mesh;
+	public GameObject bone;
 	// Use this for initialization
 	void Start () 
 	{
@@ -61,7 +62,7 @@ public class Lindenmayer : MonoBehaviour {
 		listTriangles.Add (0);
 		listTriangles.Add (2);
 		listTriangles.Add (1);
-		bones.Add (new GameObject("bone0").transform);
+		bones.Add (Instantiate(bone).transform);
 		bones [bones.Count - 1].SetParent (transform);
 		bones [bones.Count - 1].transform.localRotation = transform.rotation;
 		bones [bones.Count - 1].transform.localPosition = transform.position;
@@ -125,7 +126,7 @@ public class Lindenmayer : MonoBehaviour {
 			else if (current[i] == 'F')
 			{
 				int tmpCount = 0;
-				bones.Add (new GameObject("bone" + listPositions.Count).transform);
+				bones.Add (Instantiate(bone).transform);
 				bones [bones.Count - 1].SetParent (transform);
 				bones [bones.Count - 1].transform.localRotation = transform.rotation;
 				bones [bones.Count - 1].transform.localPosition = transform.position;
